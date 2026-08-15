@@ -21,10 +21,10 @@ int main() {
     // ------------------------------------------------------------------------
     {
         uint16_t raw_inst = 0x1298;
-        DecodedInst d = decode(raw_inst);
+        decodedInst d = decode(raw_inst);
 
         bool pass = (d.opcode == 0x1) &&
-                    (d.format == Format::R) &&
+                    (d.format == format::R) &&
                     (d.rd == 1) &&
                     (d.rs1 == 2) &&
                     (d.rs2 == 3);
@@ -40,10 +40,10 @@ int main() {
     // ------------------------------------------------------------------------
     {
         uint16_t raw_inst = 0xA87C;
-        DecodedInst d = decode(raw_inst);
+        decodedInst d = decode(raw_inst);
 
         bool pass = (d.opcode == 0xA) &&
-                    (d.format == Format::L) &&
+                    (d.format == format::L) &&
                     (d.rd == 4) &&
                     (d.rs1 == 1) &&
                     ((int16_t)d.imm5_s == -2);
@@ -59,10 +59,10 @@ int main() {
     // ------------------------------------------------------------------------
     {
         uint16_t raw_inst = 0xBB86;
-        DecodedInst d = decode(raw_inst);
+        decodedInst d = decode(raw_inst);
 
         bool pass = (d.opcode == 0xB) &&
-                    (d.format == Format::S) &&
+                    (d.format == format::S) &&
                     (d.rs1 == 5) &&
                     (d.rs2 == 6) &&
                     ((int16_t)d.imm5_s == 3);
@@ -78,10 +78,10 @@ int main() {
     // ------------------------------------------------------------------------
     {
         uint16_t raw_inst = 0xC7EC;
-        DecodedInst d = decode(raw_inst);
+        decodedInst d = decode(raw_inst);
 
         bool pass = (d.opcode == 0xC) &&
-                    (d.format == Format::Z) &&
+                    (d.format == format::Z) &&
                     (d.rs1 == 3) &&
                     ((int16_t)d.imm8_s == -10);
 

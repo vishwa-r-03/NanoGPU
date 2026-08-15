@@ -11,10 +11,10 @@ constexpr size_t DATA_MEM_SIZE = 512;  // Shared data memory (16-bit words)
 constexpr size_t INST_MEM_SIZE = 256;  // Instruction memory
 
 // Single Lane Representation
-struct Lane {
+struct lane {
     std::array<uint16_t, REGS_PER_LANE> regs{}; // Private register file
 
-    Lane();
+    lane();
 
     void init(uint16_t lane_id);
     uint16_t read_reg(size_t reg_num) const;
@@ -22,15 +22,15 @@ struct Lane {
 };
 
 // Machine State Representation
-struct GPUState {
+struct gpuState {
     uint16_t pc;                                   // Program counter (word address)
     bool halted;                                   // Execution completion flag
     
-    std::array<Lane, NUM_LANES> lanes;             // 8 SIMT lanes
+    std::array<lane, NUM_LANES> lanes;             // 8 SIMT lanes
     std::array<uint16_t, DATA_MEM_SIZE> data_mem;  // Flat unified data memory
     std::array<uint16_t, INST_MEM_SIZE> inst_mem;  // Instruction memory
 
-    GPUState();
+    gpuState();
 
     void reset();
 };

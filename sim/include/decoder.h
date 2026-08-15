@@ -4,7 +4,7 @@
 
 // Every opcode maps to exactly one of these six field layouts.
 // See docs/isa.md's "Instruction encoding" table for the bit diagrams.
-enum class Format {
+enum class format {
     R,  // opcode[4] rd[3] rs1[3] rs2[3] reserved[2] P[1]
     C,  // opcode[4] rd[3] imm[8] P[1]                       -- IADDI, LUI
     L,  // opcode[4] rd[3] rs1[3] imm[5] P[1]                -- LOAD
@@ -15,11 +15,11 @@ enum class Format {
 
 // Which format a given 4-bit opcode uses. One place, one source of truth --
 // decode() below just asks this instead of re-deriving it per opcode.
-Format opcode_format(uint8_t opcode);
+format opcode_format(uint8_t opcode);
 
-struct DecodedInst {
+struct decodedInst {
     uint8_t opcode;
-    Format  format;
+    format  format;
 
     uint8_t rd;
     uint8_t rs1;
@@ -31,4 +31,4 @@ struct DecodedInst {
 };
 
 uint16_t sign_extend(uint16_t value, uint8_t bits);
-DecodedInst decode(uint16_t instruction);
+decodedInst decode(uint16_t instruction);
