@@ -19,7 +19,7 @@ format opcode_format(uint8_t opcode);
 
 struct decodedInst {
     uint8_t opcode;
-    format  format;
+    format  fmt;
 
     uint8_t rd;
     uint8_t rs1;

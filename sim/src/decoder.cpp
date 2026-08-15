@@ -26,9 +26,9 @@ format opcode_format(uint8_t opcode) {
 decodedInst decode(uint16_t instruction) {
     decodedInst inst{};
     inst.opcode = (instruction >> 12) & 0xF;
-    inst.format = opcode_format(inst.opcode);
+    inst.fmt = opcode_format(inst.opcode);
 
-    switch (inst.format) {
+    switch (inst.fmt) {
         case format::R: {
             inst.rd  = (instruction >> 9) & 0x7;
             inst.rs1 = (instruction >> 6) & 0x7;
