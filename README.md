@@ -18,7 +18,8 @@ This project has two goals, and both shape how it's built:
 
 ## Why build a GPU instead of another CPU?
 
-A CPU core is optimized for **latency** — get one instruction stream through as fast as possible, with branch prediction, out-of-order execution, deep caches.
+A CPU core is optimized for **latency** — get one instruction stream through as fast as
+possible, with branch prediction, out-of-order execution, deep caches.
 
 A GPU is optimized for **throughput** — run the *same* instruction across
 *hundreds or thousands* of data elements at once, and hide memory latency by
@@ -31,16 +32,17 @@ Full glossary and concept primer: [`docs/architecture.md`](docs/architecture.md)
 
 ## Project status
 
-🚧 **Phase 1: Architecture definition.** No RTL yet — we're locking the
-datapath and ISA before writing a single line of Verilog, the same way you'd
-plan a building before pouring concrete.
+🚧 **Phase 2: Functional simulator (C++).** Architecture and ISA are fully
+locked (Phase 1 complete). Building the C++ model that proves the ISA works
+before any RTL exists: machine state and decoder are done and tested; the
+execution engine is next.
 
 ## Roadmap
 
 | Phase | What | Status |
 |---|---|---|
-| 1 | Architecture & ISA definition | 🚧 in progress |
-| 2 | Functional simulator (Python/C model of the ISA) | ⬜ not started |
+| 1 | Architecture & ISA definition | ✅ done |
+| 2 | Functional simulator (C++ model of the ISA) | 🚧 in progress |
 | 3 | RTL: core datapath (fetch/decode/scheduler/lanes/memory) | ⬜ not started |
 | 4 | Unit testbenches (ALU, regfile, scheduler, memory) | ⬜ not started |
 | 5 | Integration testbenches + real kernels (vector add, reduction) | ⬜ not started |
@@ -59,21 +61,57 @@ nanogpu/
 │   ├── architecture.md    living design doc: concepts, decisions, rationale
 │   ├── isa.md              full v1 instruction set reference
 │   └── waveforms/         exported waveform screenshots referenced in docs
-├── rtl/                   synthesizable Verilog source
-├── tb/                    testbenches (one per RTL module, plus integration)
-└── sim/                   simulation scripts, Makefiles, compiled kernels
+├── rtl/                   synthesizable Verilog source (Phase 3+)
+├── tb/                    RTL testbenches (Phase 4+)
+└── sim/                   C++ functional simulator (Phase 2)
+    ├── include/           headers (state.h, decoder.h, ...)
+    ├── src/                implementations (decoder.cpp, ...)
+    └── test/               unit tests for the simulator itself
 ```
 
 ## Toolchain
 
+**Simulator (Phase 2, current):**
+- **C++17**, compiled with `g++` — no build system yet beyond direct
+  `g++` invocations; a Makefile lands once there are enough files to
+  justify one.
+
+**RTL (Phase 3+):**
 - **Verilog** (IEEE 1364), kept portable — no vendor-specific syntax where avoidable.
 - **Icarus Verilog** (`iverilog`) for simulation — free, open source, one `apt install` away.
 - **GTKWave** for waveform viewing.
 - FPGA synthesis target is decided in Phase 7, once the design is verified in simulation.
 
+### ⚠️ Windows setup gotcha: use MSYS2 UCRT64, not MINGW64
+
+If you're on Windows via [MSYS2](https://www.msys2.org/), install and use
+the **`MSYS2 UCRT64`** shell — not `MSYS2 MinGW x64` (MINGW64). MSYS2 ships
+several parallel environments, each with its own `bin/` folder and its own
+builds of every shared library. If you launch the wrong one, `g++` compiles
+will fail with a symptom that's genuinely confusing to debug: `g++` reports
+no error at all, just a bare nonzero exit code, because it's silently
+handing off to a compiler stage (`cc1plus.exe`) that fails to load correct
+DLLs at the OS level, before it ever gets a chance to print anything.
+
+Symptom to watch for: `which g++` resolving to `/mingw64/bin/g++` instead
+of `/ucrt64/bin/g++` (or `/c/msys64/ucrt64/bin/g++`). If you're already in
+the wrong shell, `export PATH="/c/msys64/ucrt64/bin:$PATH"` fixes it for
+that session — but switching to the correct shortcut is the real fix.
+
 ## Building & running
 
-*(Coming in Phase 3, once there's RTL to build.)*
+**Simulator tests** (from the repo root, in a correctly-configured shell — see above):
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Isim/include sim/src/decoder.cpp sim/test/decoder_test.cpp -o decoder_test.exe
+./decoder_test.exe
+```
+
+More test binaries will follow this same pattern as the simulator grows;
+each `sim/test/*.cpp` file is compiled together with whichever `sim/src/*.cpp`
+files it depends on.
+
+**RTL simulation:** *(coming in Phase 3, once there's RTL to build.)*
 
 ## License
 
