@@ -1,6 +1,5 @@
 # NanoGPU — a from-scratch educational GPGPU
 
-> Placeholder name — rename freely once it feels like "yours."
 
 NanoGPU is a small, fully open-source GPGPU built in Verilog, designed to be
 read, understood, and rebuilt by anyone — not just run as a black box. It is
@@ -32,18 +31,20 @@ Full glossary and concept primer: [`docs/architecture.md`](docs/architecture.md)
 
 ## Project status
 
-🚧 **Phase 2: Functional simulator (C++).** Architecture and ISA are fully
-locked (Phase 1 complete). Building the C++ model that proves the ISA works
-before any RTL exists: machine state and decoder are done and tested; the
-execution engine is next.
+🚧 **Phase 3: RTL datapath (Verilog).** The C++ functional simulator is
+complete and verified (Phase 2): machine state, decoder, and the SIMT
+executor are all tested, and a real 8-wide vector-add kernel runs correctly
+end to end — proof the ISA and execution model work before a single line
+of Verilog exists. Now translating that proven design into synthesizable
+RTL.
 
 ## Roadmap
 
 | Phase | What | Status |
 |---|---|---|
 | 1 | Architecture & ISA definition | ✅ done |
-| 2 | Functional simulator (C++ model of the ISA) | 🚧 in progress |
-| 3 | RTL: core datapath (fetch/decode/scheduler/lanes/memory) | ⬜ not started |
+| 2 | Functional simulator (C++ model of the ISA) | ✅ done |
+| 3 | RTL: core datapath (fetch/decode/scheduler/lanes/memory) | 🚧 in progress |
 | 4 | Unit testbenches (ALU, regfile, scheduler, memory) | ⬜ not started |
 | 5 | Integration testbenches + real kernels (vector add, reduction) | ⬜ not started |
 | 6 | v2: multiple warps, latency hiding, divergence handling | ⬜ not started |
@@ -103,13 +104,19 @@ that session — but switching to the correct shortcut is the real fix.
 **Simulator tests** (from the repo root, in a correctly-configured shell — see above):
 
 ```bash
-g++ -std=c++17 -Wall -Wextra -Isim/include sim/src/decoder.cpp sim/test/decoder_test.cpp -o decoder_test.exe
-./decoder_test.exe
+make test
 ```
 
-More test binaries will follow this same pattern as the simulator grows;
-each `sim/test/*.cpp` file is compiled together with whichever `sim/src/*.cpp`
-files it depends on.
+This builds `decoder_test`, `exec_test`, and `vector_add_test` into `build/`
+and runs all three, stopping on the first failure. `make` alone builds
+without running; `make clean` removes `build/`.
+
+To build/run a single test binary directly (e.g. while iterating on one
+piece), the underlying `g++` invocations follow this pattern:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Isim/include sim/src/decoder.cpp sim/test/decoder_test.cpp -o decoder_test.exe
+```
 
 **RTL simulation:** *(coming in Phase 3, once there's RTL to build.)*
 
